@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"strconv"
@@ -100,6 +101,11 @@ func (s *Server) handleRequests(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Ensure we return an empty array instead of null
+		if requests == nil {
+			requests = []models.Request{}
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(requests)
 
@@ -181,6 +187,11 @@ func (s *Server) handleFolders(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Ensure we return an empty array instead of null
+		if folders == nil {
+			folders = []models.Folder{}
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(folders)
 
@@ -254,10 +265,42 @@ func (s *Server) handleFolderByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	if path == "/" {
+		path = "/index.html"
+	}
+
 	if s.frontendFS != nil {
-		fileServer := http.FileServer(http.FS(s.frontendFS))
-		fileServer.ServeHTTP(w, r)
+		file, err := s.frontendFS.Open(strings.TrimPrefix(path, "/"))
+		if err != nil {
+			// If file not found, serve index.html for client-side routing
+			file, err = s.frontendFS.Open("index.html")
+			if err != nil {
+				http.NotFound(w, r)
+				return
+			}
+		}
+		defer file.Close()
+
+		stat, err := file.Stat()
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Set appropriate content type based on file extension
+		if strings.HasSuffix(path, ".css") {
+			w.Header().Set("Content-Type", "text/css")
+		} else if strings.HasSuffix(path, ".js") {
+			w.Header().Set("Content-Type", "application/javascript")
+		} else if strings.HasSuffix(path, ".html") {
+			w.Header().Set("Content-Type", "text/html")
+		} else if strings.HasSuffix(path, ".woff2") {
+			w.Header().Set("Content-Type", "font/woff2")
+		}
+
+		http.ServeContent(w, r, stat.Name(), stat.ModTime(), file.(io.ReadSeeker))
 	} else {
-		http.ServeFile(w, r, "frontend/out"+r.URL.Path)
+		http.ServeFile(w, r, "frontend/out"+path)
 	}
 }
