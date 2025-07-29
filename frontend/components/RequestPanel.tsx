@@ -94,18 +94,34 @@ export default function RequestPanel({
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 border-b border-base-300">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="input input-bordered w-full mb-4"
-          placeholder="Request name"
-        />
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input input-bordered input-sm flex-1"
+            placeholder="Request name"
+          />
+          <button onClick={handleSave} className="btn btn-secondary btn-sm">
+            Save
+          </button>
+          <button
+            onClick={handleSend}
+            disabled={loading || !url}
+            className="btn btn-primary btn-sm"
+          >
+            {loading ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              'Send'
+            )}
+          </button>
+        </div>
         <div className="flex gap-2">
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value)}
-            className="select select-bordered w-32"
+            className="select select-bordered select-sm w-32"
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
@@ -119,23 +135,9 @@ export default function RequestPanel({
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="input input-bordered flex-1"
+            className="input input-bordered input-sm flex-1"
             placeholder="https://api.example.com/endpoint"
           />
-          <button
-            onClick={handleSend}
-            disabled={loading || !url}
-            className="btn btn-primary"
-          >
-            {loading ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              'Send'
-            )}
-          </button>
-          <button onClick={handleSave} className="btn btn-secondary">
-            Save
-          </button>
         </div>
       </div>
 

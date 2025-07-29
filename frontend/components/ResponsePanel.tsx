@@ -71,22 +71,24 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
                 </pre>
               </div>
             ) : (
-              <table className="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Header</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(response.headers).map(([key, value]) => (
-                    <tr key={key}>
-                      <td className="font-medium">{key}</td>
-                      <td className="text-sm">{value}</td>
+              <div className="h-full overflow-auto">
+                <table className="table table-sm">
+                  <thead>
+                    <tr>
+                      <th className="w-2/5">Header</th>
+                      <th className="w-3/5">Value</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Object.entries(response.headers).map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="font-medium w-2/5">{key}</td>
+                        <td className="text-sm w-3/5 break-words">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </>
