@@ -5,7 +5,8 @@
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "24"
 		},
-		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0.5": {}
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0.5": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	"customizations": {
 		"vscode": {
@@ -14,5 +15,13 @@
 				"biomejs.biome"
 			]
 		}
-	}
+	},
+	"mounts": [
+		"source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind"
+	],
+	"containerEnv": {
+		"CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+	},
+	"remoteUser": "vscode",
+	"postCreateCommand": ".devcontainer/postCreateCommand.sh"
 }
