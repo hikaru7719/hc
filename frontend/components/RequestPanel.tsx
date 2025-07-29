@@ -105,7 +105,7 @@ export default function RequestPanel({
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value)}
-            className="select select-bordered"
+            className="select select-bordered w-32"
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>

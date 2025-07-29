@@ -116,8 +116,8 @@ export default function Home() {
           fetchFolders();
         }}
       />
-      <div className="flex-1 flex">
-        <div className="w-1/2 border-r border-base-300">
+      <div className="flex-1 flex overflow-hidden">
+        <div className="w-1/2 border-r border-base-300 overflow-hidden">
           <RequestPanel
             request={selectedRequest}
             onSend={handleSendRequest}
@@ -125,7 +125,7 @@ export default function Home() {
             loading={loading}
           />
         </div>
-        <div className="w-1/2">
+        <div className="w-1/2 overflow-hidden">
           <ResponsePanel response={response} loading={loading} />
         </div>
       </div>

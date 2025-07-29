@@ -63,11 +63,13 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
             </button>
           </div>
 
-          <div className="flex-1 p-4 overflow-y-auto">
+          <div className="flex-1 p-4 overflow-hidden">
             {activeTab === 'body' ? (
-              <pre className="text-sm bg-base-300 p-4 rounded-lg overflow-x-auto">
-                <code>{formatBody(response.body)}</code>
-              </pre>
+              <div className="h-full overflow-auto">
+                <pre className="text-sm bg-base-300 p-4 rounded-lg min-w-0">
+                  <code className="block whitespace-pre-wrap break-words">{formatBody(response.body)}</code>
+                </pre>
+              </div>
             ) : (
               <table className="table table-sm">
                 <thead>
