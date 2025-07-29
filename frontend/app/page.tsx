@@ -20,7 +20,7 @@ export default function Home() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/requests');
+      const res = await fetch('/api/requests');
       const data = await res.json();
       setRequests(data);
     } catch (error) {
@@ -30,7 +30,7 @@ export default function Home() {
 
   const fetchFolders = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/folders');
+      const res = await fetch('/api/folders');
       const data = await res.json();
       setFolders(data);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function Home() {
   const handleSendRequest = async (request: Request) => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/request', {
+      const res = await fetch('/api/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function Home() {
   const handleSaveRequest = async (request: Request) => {
     try {
       if (request.id) {
-        await fetch(`http://localhost:8080/api/requests/${request.id}`, {
+        await fetch(`/api/requests/${request.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function Home() {
           body: JSON.stringify(request),
         });
       } else {
-        await fetch('http://localhost:8080/api/requests', {
+        await fetch('/api/requests', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export default function Home() {
 
   const handleDeleteRequest = async (id: number) => {
     try {
-      await fetch(`http://localhost:8080/api/requests/${id}`, {
+      await fetch(`/api/requests/${id}`, {
         method: 'DELETE',
       });
       await fetchRequests();
