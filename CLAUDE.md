@@ -4,60 +4,64 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a GUI-based HTTP client project called "hc" (HTTP Client) that integrates with Claude Code. The project is set up as a Go application with a devcontainer configuration.
-
-## Development Environment
-
-The project uses a Go devcontainer (Go 1.24) with Node.js 24 included. The devcontainer includes:
-- Claude Code feature integration
-- Biome for code formatting/linting
-- Code spell checker VS Code extension
-
-## Project Structure
-
-Currently minimal - this is a new project in early development. The repository includes:
-- `.devcontainer/` - Development container configuration
-- `.claude/` - Claude Code specific settings
-- Basic Go project structure (expected to be added)
+HC (HTTP Client) is a GUI-based HTTP client built with Go backend and Next.js frontend. It runs as a local server (`hc serve`) providing a browser-based interface for making HTTP requests. The frontend is embedded in the Go binary for single-file distribution.
 
 ## Common Commands
 
-Since this is a new Go project, typical commands will include:
-
 ```bash
-# Initialize Go module (if not already done)
-go mod init github.com/[username]/hc
+# Build everything (frontend + backend)
+make build
 
 # Run the application
-go run .
+make run
+# Or directly: ./build/hc serve
 
-# Build the application
-go build -o hc
+# Development mode with hot reload
+make dev              # Backend with air hot reload
+make dev-frontend     # Frontend dev server on port 3000
 
 # Run tests
-go test ./...
+make test             # Runs both Go and frontend tests
+go test ./...         # Go tests only
+go test ./internal/storage -v  # Run specific package tests
 
-# Format code
-go fmt ./...
+# Code quality
+make lint             # Run linters (go vet, go fmt, golangci-lint if installed, npm lint)
+go fmt ./...          # Format Go code
+go vet ./...          # Check Go code
 
-# Lint code
-go vet ./...
+# Clean build artifacts
+make clean
+
+# Install dependencies
+make deps
+
+# Build for multiple platforms
+make build-all
 ```
 
-## Architecture Notes
+## Architecture
 
-As a GUI HTTP client, the project will likely include:
-- HTTP request/response handling logic
-- GUI framework integration (to be determined)
-- Request history and management
-- Response parsing and display
-- Authentication handling
-- Request collections/environments
+### High-Level Structure
+- **CLI Entry**: `main.go` uses Cobra for command handling, primarily `hc serve`
+- **Server**: `internal/server/server.go` handles HTTP endpoints and serves embedded frontend
+- **Proxy**: `internal/proxy/proxy.go` executes HTTP requests on behalf of the frontend
+- **Storage**: `internal/storage/sqlite.go` manages SQLite database for request/folder persistence
+- **Frontend**: Next.js SPA built to static files, embedded via `embed.go`
 
-## Development Guidelines
+### API Endpoints
+- `POST /api/request` - Execute HTTP request via proxy
+- `GET/POST /api/requests` - List/create saved requests
+- `GET/PUT/DELETE /api/requests/:id` - Manage specific request
+- `GET/POST /api/folders` - List/create folders
+- `GET/PUT/DELETE /api/folders/:id` - Manage specific folder
 
-- Follow standard Go conventions and idioms
-- Use Go modules for dependency management
-- Keep HTTP client logic separate from GUI code
-- Consider using interfaces for testability
-- Structure code with clear separation between business logic and UI
+### Database Schema
+- **folders**: Hierarchical folder structure (id, name, parent_id)
+- **requests**: HTTP requests (id, name, folder_id, method, url, headers, body)
+
+### Key Implementation Details
+- Frontend files are embedded using `go:embed` in `embed.go`
+- CORS is handled in `corsMiddleware` for API endpoints
+- SQLite database is initialized in user's home directory (`~/.hc/hc.db`)
+- Static file serving falls back to index.html for client-side routing
