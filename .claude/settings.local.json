@@ -25,7 +25,9 @@
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_press_key",
       "Bash(rm:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(go get:*)",
+      "Bash(go fmt:*)"
     ],
     "deny": []
   },

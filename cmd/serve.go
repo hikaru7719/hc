@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		db, err := storage.InitDB()
 		if err != nil {
-			return fmt.Errorf("failed to initialize database: %w", err)
+			return err
 		}
 		defer db.Close()
 
