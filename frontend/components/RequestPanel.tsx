@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRequestPanelReducer } from "@/hooks/useRequestPanelReducer";
 import type { Request } from "@/types";
+import { generateCurlCommand } from "@/utils/curlGenerator";
 
 interface RequestPanelProps {
   request: Request | null;
@@ -24,6 +25,8 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
     getRequestObject,
   } = useRequestPanelReducer();
 
+  const [copiedCurl, setCopiedCurl] = useState(false);
+
   useEffect(() => {
     resetFromRequest(request);
   }, [request, resetFromRequest]);
@@ -36,6 +39,18 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
     onSave(getRequestObject(request));
   };
 
+  const handleCopyAsCurl = async () => {
+    const requestObj = getRequestObject(request);
+    const curlCommand = generateCurlCommand(requestObj);
+
+    try {
+      await navigator.clipboard.writeText(curlCommand);
+      setCopiedCurl(true);
+      setTimeout(() => setCopiedCurl(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -51,7 +66,15 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           <button type="button" onClick={handleSave} className="btn btn-secondary btn-sm">
             Save
           </button>
-          <button type="button" onClick={handleSend} disabled={loading || !state.url} className="btn btn-primary btn-sm">
+          <button type="button" onClick={handleCopyAsCurl} className="btn btn-ghost btn-sm" disabled={!state.url}>
+            {copiedCurl ? "Copied!" : "Copy as cURL"}
+          </button>
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={loading || !state.url}
+            className="btn btn-primary btn-sm"
+          >
             {loading ? <span className="loading loading-spinner loading-xs"></span> : "Send"}
           </button>
         </div>
