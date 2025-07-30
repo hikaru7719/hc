@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import RequestPanel from "@/components/RequestPanel";
 import ResponsePanel from "@/components/ResponsePanel";
 import Sidebar from "@/components/Sidebar";
@@ -8,17 +8,12 @@ import type { Request, Response, Folder } from "@/types";
 
 export default function Home() {
   const [requests, setRequests] = useState<Request[]>([]);
-  const [folders, setFolders] = useState<Folder[]>([]);
+  const [_folders, setFolders] = useState<Folder[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [response, setResponse] = useState<Response | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchRequests();
-    fetchFolders();
-  }, []);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       const res = await fetch("/api/requests");
       const data = await res.json();
@@ -26,9 +21,9 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to fetch requests:", error);
     }
-  };
+  }, []);
 
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       const res = await fetch("/api/folders");
       const data = await res.json();
@@ -36,7 +31,12 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to fetch folders:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+    fetchFolders();
+  }, [fetchRequests, fetchFolders]);
 
   const handleSendRequest = async (request: Request) => {
     setLoading(true);
@@ -107,7 +107,6 @@ export default function Home() {
     <div className="flex h-screen bg-base-200">
       <Sidebar
         requests={requests}
-        folders={folders}
         selectedRequest={selectedRequest}
         onSelectRequest={setSelectedRequest}
         onDeleteRequest={handleDeleteRequest}
