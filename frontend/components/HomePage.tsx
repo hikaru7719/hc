@@ -8,14 +8,8 @@ import type { Request } from "@/types";
 
 export default function HomePage() {
   const { data: requests = [], error: requestsError } = useSWR<Request[]>(API_ENDPOINTS.REQUESTS, fetcher);
-  const {
-    state,
-    setSelectedRequest,
-    clearRequestAndResponse,
-    startRequest,
-    requestSuccess,
-    requestFailure,
-  } = useAppReducer();
+  const { state, setSelectedRequest, clearRequestAndResponse, startRequest, requestSuccess, requestFailure } =
+    useAppReducer();
 
   if (requestsError) {
     console.error("Failed to fetch requests:", requestsError);
