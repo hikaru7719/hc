@@ -55,7 +55,7 @@ export default function Sidebar({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDeleteRequest(request.id);
+                      if (request.id) onDeleteRequest(request.id);
                     }}
                     className="btn btn-ghost btn-xs"
                   >
