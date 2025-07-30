@@ -1,8 +1,7 @@
-import type { Request, Folder } from "@/types";
+import type { Request } from "@/types";
 
 interface SidebarProps {
   requests: Request[];
-  folders: Folder[];
   selectedRequest: Request | null;
   onSelectRequest: (request: Request) => void;
   onDeleteRequest: (id: number) => void;
@@ -11,7 +10,6 @@ interface SidebarProps {
 
 export default function Sidebar({
   requests,
-  folders,
   selectedRequest,
   onSelectRequest,
   onDeleteRequest,
@@ -22,7 +20,7 @@ export default function Sidebar({
       <div className="p-4 border-b border-base-300">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Requests</h2>
-          <button onClick={onRefresh} className="btn btn-sm btn-ghost" title="Refresh">
+          <button type="button" onClick={onRefresh} className="btn btn-sm btn-ghost" title="Refresh">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
@@ -30,6 +28,7 @@ export default function Sidebar({
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
+              <title>Refresh</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -47,15 +46,16 @@ export default function Sidebar({
               <div
                 className={`flex items-center justify-between ${selectedRequest?.id === request.id ? "active" : ""}`}
               >
-                <button onClick={() => onSelectRequest(request)} className="flex-1 text-left">
+                <button type="button" onClick={() => onSelectRequest(request)} className="flex-1 text-left">
                   <span className="badge badge-sm mr-2">{request.method}</span>
                   <span className="text-sm">{request.name}</span>
                 </button>
                 {request.id && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDeleteRequest(request.id!);
+                      onDeleteRequest(request.id);
                     }}
                     className="btn btn-ghost btn-xs"
                   >
@@ -66,6 +66,7 @@ export default function Sidebar({
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
+                      <title>Delete</title>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"

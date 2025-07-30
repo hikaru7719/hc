@@ -12,7 +12,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
   const [name, setName] = useState("");
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
-  const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([{ key: "", value: "" }]);
+  const [headers, setHeaders] = useState<Array<{ id: string; key: string; value: string }>>([{ id: crypto.randomUUID(), key: "", value: "" }]);
   const [body, setBody] = useState("");
   const [activeTab, setActiveTab] = useState<"headers" | "body">("headers");
 
@@ -23,15 +23,15 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
       setUrl(request.url);
       setHeaders(
         Object.entries(request.headers).length > 0
-          ? Object.entries(request.headers).map(([key, value]) => ({ key, value }))
-          : [{ key: "", value: "" }],
+          ? Object.entries(request.headers).map(([key, value]) => ({ id: crypto.randomUUID(), key, value }))
+          : [{ id: crypto.randomUUID(), key: "", value: "" }],
       );
       setBody(request.body);
     } else {
       setName("New Request");
       setMethod("GET");
       setUrl("");
-      setHeaders([{ key: "", value: "" }]);
+      setHeaders([{ id: crypto.randomUUID(), key: "", value: "" }]);
       setBody("");
     }
   }, [request]);
@@ -77,7 +77,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
   };
 
   const addHeader = () => {
-    setHeaders([...headers, { key: "", value: "" }]);
+    setHeaders([...headers, { id: crypto.randomUUID(), key: "", value: "" }]);
   };
 
   const updateHeader = (index: number, field: "key" | "value", value: string) => {
@@ -101,10 +101,10 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
             className="input input-bordered input-sm flex-1"
             placeholder="Request name"
           />
-          <button onClick={handleSave} className="btn btn-secondary btn-sm">
+          <button type="button" onClick={handleSave} className="btn btn-secondary btn-sm">
             Save
           </button>
-          <button onClick={handleSend} disabled={loading || !url} className="btn btn-primary btn-sm">
+          <button type="button" onClick={handleSend} disabled={loading || !url} className="btn btn-primary btn-sm">
             {loading ? <span className="loading loading-spinner loading-xs"></span> : "Send"}
           </button>
         </div>
@@ -135,12 +135,13 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
       <div className="flex-1 flex flex-col">
         <div className="tabs tabs-boxed p-4">
           <button
+            type="button"
             className={`tab ${activeTab === "headers" ? "tab-active" : ""}`}
             onClick={() => setActiveTab("headers")}
           >
             Headers
           </button>
-          <button className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
+          <button type="button" className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
             Body
           </button>
         </div>
@@ -149,7 +150,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           {activeTab === "headers" ? (
             <div>
               {headers.map((header, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                <div key={header.id} className="flex gap-2 mb-2">
                   <input
                     type="text"
                     value={header.key}
@@ -164,7 +165,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
                     className="input input-bordered input-sm flex-1"
                     placeholder="Header value"
                   />
-                  <button onClick={() => removeHeader(index)} className="btn btn-ghost btn-sm">
+                  <button type="button" onClick={() => removeHeader(index)} className="btn btn-ghost btn-sm">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
@@ -172,12 +173,13 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
+                      <title>Remove</title>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
               ))}
-              <button onClick={addHeader} className="btn btn-ghost btn-sm">
+              <button type="button" onClick={addHeader} className="btn btn-ghost btn-sm">
                 + Add Header
               </button>
             </div>

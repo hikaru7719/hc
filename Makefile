@@ -38,6 +38,8 @@ build-backend:
 build-frontend:
 	@echo "$(YELLOW)Building frontend...$(NC)"
 	@cd $(FRONTEND_DIR) && $(NPM_CMD) install
+	@cd $(FRONTEND_DIR) && $(NPM_CMD) run lint
+	@cd $(FRONTEND_DIR) && $(NPM_CMD) run format
 	@cd $(FRONTEND_DIR) && $(NPM_CMD) run build
 	@echo "$(GREEN)✓ Frontend built: $(FRONTEND_DIR)/out$(NC)"
 
