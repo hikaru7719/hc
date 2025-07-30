@@ -18,23 +18,23 @@ type DB struct {
 func InitDB() (*DB, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get home directory: %w", err)
+		return nil, err
 	}
 
 	dbDir := filepath.Join(homeDir, ".hc")
 	if err := os.MkdirAll(dbDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create db directory: %w", err)
+		return nil, err
 	}
 
 	dbPath := filepath.Join(dbDir, "hc.db")
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, err
 	}
 
 	if err := createTables(db); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to create tables: %w", err)
+		return nil, err
 	}
 
 	return &DB{db}, nil

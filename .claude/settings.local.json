@@ -26,6 +26,8 @@
       "mcp__playwright__browser_press_key",
       "Bash(rm:*)",
       "Bash(git rm:*)",
+      "Bash(go get:*)",
+      "Bash(go fmt:*)"
       "Bash(yarn lint)",
       "Bash(yarn biome lint:*)"
     ],

@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -26,7 +26,7 @@ func NewClient() *Client {
 func (c *Client) ExecuteRequest(req *models.Request) (*models.Response, error) {
 	httpReq, err := http.NewRequest(req.Method, req.URL, strings.NewReader(req.Body))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, err
 	}
 
 	for key, value := range req.Headers {
@@ -40,7 +40,7 @@ func (c *Client) ExecuteRequest(req *models.Request) (*models.Response, error) {
 	start := time.Now()
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -48,7 +48,7 @@ func (c *Client) ExecuteRequest(req *models.Request) (*models.Response, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return nil, err
 	}
 
 	headers := make(map[string]string)
@@ -84,11 +84,11 @@ func (c *Client) ProxyRequest(proxyReq *ProxyRequest) (*models.Response, error) 
 
 func ValidateURL(url string) error {
 	if url == "" {
-		return fmt.Errorf("URL is required")
+		return errors.New("URL is required")
 	}
 
 	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
-		return fmt.Errorf("URL must start with http:// or https://")
+		return errors.New("URL must start with http:// or https://")
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func ValidateMethod(method string) error {
 		}
 	}
 
-	return fmt.Errorf("invalid HTTP method: %s", method)
+	return errors.New("invalid HTTP method: " + method)
 }
 
 func CopyHeaders(src http.Header) map[string]string {
