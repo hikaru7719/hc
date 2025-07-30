@@ -52,7 +52,11 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
             >
               Headers
             </button>
-            <button type="button" className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
+            <button
+              type="button"
+              className={`tab ${activeTab === "body" ? "tab-active" : ""}`}
+              onClick={() => setActiveTab("body")}
+            >
               Body
             </button>
           </div>

@@ -29,7 +29,10 @@
       "Bash(go get:*)",
       "Bash(go fmt:*)"
       "Bash(yarn lint)",
-      "Bash(yarn biome lint:*)"
+      "Bash(yarn biome lint:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run format:*)"
     ],
     "deny": []
   },

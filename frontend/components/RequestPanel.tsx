@@ -12,7 +12,9 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
   const [name, setName] = useState("");
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
-  const [headers, setHeaders] = useState<Array<{ id: string; key: string; value: string }>>([{ id: crypto.randomUUID(), key: "", value: "" }]);
+  const [headers, setHeaders] = useState<Array<{ id: string; key: string; value: string }>>([
+    { id: crypto.randomUUID(), key: "", value: "" },
+  ]);
   const [body, setBody] = useState("");
   const [activeTab, setActiveTab] = useState<"headers" | "body">("headers");
 
@@ -141,7 +143,11 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           >
             Headers
           </button>
-          <button type="button" className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
+          <button
+            type="button"
+            className={`tab ${activeTab === "body" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("body")}
+          >
             Body
           </button>
         </div>

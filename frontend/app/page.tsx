@@ -1,42 +1,29 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import useSWR, { mutate } from "swr";
 import RequestPanel from "@/components/RequestPanel";
 import ResponsePanel from "@/components/ResponsePanel";
 import Sidebar from "@/components/Sidebar";
-import type { Request, Response, Folder } from "@/types";
+import type { Request, Response } from "@/types";
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetch");
+  }
+  return res.json();
+};
 
 export default function Home() {
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [_folders, setFolders] = useState<Folder[]>([]);
+  const { data: requests = [], error: requestsError } = useSWR<Request[]>("/api/requests", fetcher);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [response, setResponse] = useState<Response | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchRequests = useCallback(async () => {
-    try {
-      const res = await fetch("/api/requests");
-      const data = await res.json();
-      setRequests(data);
-    } catch (error) {
-      console.error("Failed to fetch requests:", error);
-    }
-  }, []);
-
-  const fetchFolders = useCallback(async () => {
-    try {
-      const res = await fetch("/api/folders");
-      const data = await res.json();
-      setFolders(data);
-    } catch (error) {
-      console.error("Failed to fetch folders:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRequests();
-    fetchFolders();
-  }, [fetchRequests, fetchFolders]);
+  if (requestsError) {
+    console.error("Failed to fetch requests:", requestsError);
+  }
 
   const handleSendRequest = async (request: Request) => {
     setLoading(true);
@@ -82,7 +69,7 @@ export default function Home() {
           body: JSON.stringify(request),
         });
       }
-      await fetchRequests();
+      await mutate("/api/requests");
     } catch (error) {
       console.error("Failed to save request:", error);
     }
@@ -93,7 +80,7 @@ export default function Home() {
       await fetch(`/api/requests/${id}`, {
         method: "DELETE",
       });
-      await fetchRequests();
+      await mutate("/api/requests");
       if (selectedRequest?.id === id) {
         setSelectedRequest(null);
         setResponse(null);
@@ -111,8 +98,7 @@ export default function Home() {
         onSelectRequest={setSelectedRequest}
         onDeleteRequest={handleDeleteRequest}
         onRefresh={() => {
-          fetchRequests();
-          fetchFolders();
+          mutate("/api/requests");
         }}
       />
       <div className="flex-1 flex overflow-hidden">

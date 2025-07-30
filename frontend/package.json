@@ -15,7 +15,8 @@
     "daisyui": "^5.0.47",
     "next": "15.4.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "swr": "^2.3.4"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.3",
