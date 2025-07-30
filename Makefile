@@ -77,6 +77,18 @@ test:
 	$(GO_CMD) test -v ./...
 	@cd $(FRONTEND_DIR) && $(NPM_CMD) test
 
+# Run tests with coverage
+test-coverage:
+	@echo "$(YELLOW)Running tests with coverage...$(NC)"
+	@mkdir -p coverage
+	$(GO_CMD) test -v -race -coverprofile=coverage/coverage.out -covermode=atomic ./...
+	@echo "$(GREEN)✓ Coverage report: coverage/coverage.out$(NC)"
+	@echo ""
+	@echo "Coverage summary:"
+	@$(GO_CMD) tool cover -func=coverage/coverage.out | tail -1
+	@$(GO_CMD) tool cover -html=coverage/coverage.out -o coverage/coverage.html
+	@echo "$(GREEN)✓ HTML report: coverage/coverage.html$(NC)"
+
 # Lint code
 lint:
 	@echo "$(YELLOW)Running linters...$(NC)"
@@ -121,6 +133,7 @@ help:
 	@echo "  dev            Run backend in development mode with hot reload"
 	@echo "  dev-frontend   Run frontend development server"
 	@echo "  test           Run all tests"
+	@echo "  test-coverage  Run tests with coverage report"
 	@echo "  lint           Run linters"
 	@echo "  deps           Install all dependencies"
 	@echo "  build-all      Build for multiple platforms"

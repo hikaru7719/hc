@@ -98,8 +98,16 @@ func InitDB() (*DB, error) {
 	return wrapper, nil
 }
 
-// getDBPath returns the path to the database file
-func getDBPath() (string, error) {
+// getDBPath is a variable holding the function to get database path (for testing)
+var getDBPath = defaultGetDBPath
+
+// defaultGetDBPath returns the path to the database file
+func defaultGetDBPath() (string, error) {
+	// Check for test database path
+	if testPath := os.Getenv("HC_TEST_DB_PATH"); testPath != "" {
+		return testPath, nil
+	}
+	
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err

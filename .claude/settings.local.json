@@ -1,56 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)",
-      "Bash(ls:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(mkdir:*)",
-      "Bash(go mod init:*)",
-      "Bash(make:*)",
-      "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_install",
-      "mcp__playwright__browser_take_screenshot",
-      "mcp__playwright__browser_console_messages",
-      "mcp__playwright__browser_network_requests",
-      "mcp__playwright__browser_evaluate",
-      "Bash(npm run build:*)",
-      "Bash(./build/hc serve)",
-      "mcp__playwright__browser_close",
-      "Bash(pkill:*)",
-      "mcp__playwright__browser_type",
-      "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_click",
-      "mcp__playwright__browser_select_option",
-      "mcp__playwright__browser_wait_for",
-      "mcp__playwright__browser_press_key",
-      "Bash(rm:*)",
-      "Bash(git rm:*)",
       "Bash(go get:*)",
-      "Bash(go fmt:*)"
-      "Bash(yarn lint)",
-      "Bash(yarn biome lint:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run lint)",
-      "Bash(npm run format:*)"
+      "Bash(go mod:*)",
+      "Bash(make:*)",
+      "Bash(git reset:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(go test:*)",
+      "Bash(chmod:*)",
+      "Bash(go tool cover:*)"
     ],
     "deny": []
-  },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "playwright"
-  ],
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Stop",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "make build"
-          }
-        ]
-      }
-    ]
   }
 }
