@@ -1,0 +1,39 @@
+name: Backend CI
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - '.github/workflows/backend.yml'
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+    - uses: actions/cache@v4
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - run: go mod download
+    - run: |
+        fmt_output=$(go fmt ./...)
+        if [ -n "$fmt_output" ]; then
+          echo "The following files need formatting:"
+          echo "$fmt_output"
+          exit 1
+        fi
+    - run: go vet ./...
+    - uses: golangci/golangci-lint-action@v6
+      with:
+        version: latest
+        args: --timeout=5m
+    - run: go build -v ./...
+    - run: go test -v -race ./...
