@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Response } from '@/types';
+import { useState } from "react";
+import type { Response } from "@/types";
 
 interface ResponsePanelProps {
   response: Response | null;
@@ -7,7 +7,7 @@ interface ResponsePanelProps {
 }
 
 export default function ResponsePanel({ response, loading }: ResponsePanelProps) {
-  const [activeTab, setActiveTab] = useState<'body' | 'headers'>('body');
+  const [activeTab, setActiveTab] = useState<"body" | "headers">("body");
 
   const formatBody = (body: string) => {
     try {
@@ -19,11 +19,11 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
   };
 
   const getStatusBadgeClass = (statusCode: number) => {
-    if (statusCode >= 200 && statusCode < 300) return 'badge-success';
-    if (statusCode >= 300 && statusCode < 400) return 'badge-info';
-    if (statusCode >= 400 && statusCode < 500) return 'badge-warning';
-    if (statusCode >= 500) return 'badge-error';
-    return 'badge-ghost';
+    if (statusCode >= 200 && statusCode < 300) return "badge-success";
+    if (statusCode >= 300 && statusCode < 400) return "badge-info";
+    if (statusCode >= 400 && statusCode < 500) return "badge-warning";
+    if (statusCode >= 500) return "badge-error";
+    return "badge-ghost";
   };
 
   return (
@@ -32,12 +32,8 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
         <h3 className="text-lg font-semibold mb-2">Response</h3>
         {response && (
           <div className="flex items-center gap-4">
-            <span className={`badge ${getStatusBadgeClass(response.status_code)}`}>
-              {response.status_code}
-            </span>
-            <span className="text-sm text-base-content/70">
-              {response.duration}ms
-            </span>
+            <span className={`badge ${getStatusBadgeClass(response.status_code)}`}>{response.status_code}</span>
+            <span className="text-sm text-base-content/70">{response.duration}ms</span>
           </div>
         )}
       </div>
@@ -50,21 +46,18 @@ export default function ResponsePanel({ response, loading }: ResponsePanelProps)
         <>
           <div className="tabs tabs-boxed p-4">
             <button
-              className={`tab ${activeTab === 'headers' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('headers')}
+              className={`tab ${activeTab === "headers" ? "tab-active" : ""}`}
+              onClick={() => setActiveTab("headers")}
             >
               Headers
             </button>
-            <button
-              className={`tab ${activeTab === 'body' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('body')}
-            >
+            <button className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
               Body
             </button>
           </div>
 
           <div className="flex-1 p-4 overflow-hidden">
-            {activeTab === 'body' ? (
+            {activeTab === "body" ? (
               <div className="h-full overflow-auto">
                 <pre className="text-sm bg-base-300 p-4 rounded-lg min-w-0">
                   <code className="block whitespace-pre-wrap break-words">{formatBody(response.body)}</code>

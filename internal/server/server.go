@@ -15,18 +15,18 @@ import (
 )
 
 type Server struct {
-	port       int
-	db         *storage.DB
+	port        int
+	db          *storage.DB
 	proxyClient *proxy.Client
-	frontendFS fs.FS
+	frontendFS  fs.FS
 }
 
 func New(port int, db *storage.DB, frontendFS fs.FS) *Server {
 	return &Server{
-		port:       port,
-		db:         db,
+		port:        port,
+		db:          db,
 		proxyClient: proxy.NewClient(),
-		frontendFS: frontendFS,
+		frontendFS:  frontendFS,
 	}
 }
 

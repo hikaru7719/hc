@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Request } from '@/types';
+import { useState, useEffect } from "react";
+import type { Request } from "@/types";
 
 interface RequestPanelProps {
   request: Request | null;
@@ -8,20 +8,13 @@ interface RequestPanelProps {
   loading: boolean;
 }
 
-export default function RequestPanel({
-  request,
-  onSend,
-  onSave,
-  loading,
-}: RequestPanelProps) {
-  const [name, setName] = useState('');
-  const [method, setMethod] = useState('GET');
-  const [url, setUrl] = useState('');
-  const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([
-    { key: '', value: '' },
-  ]);
-  const [body, setBody] = useState('');
-  const [activeTab, setActiveTab] = useState<'headers' | 'body'>('headers');
+export default function RequestPanel({ request, onSend, onSave, loading }: RequestPanelProps) {
+  const [name, setName] = useState("");
+  const [method, setMethod] = useState("GET");
+  const [url, setUrl] = useState("");
+  const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([{ key: "", value: "" }]);
+  const [body, setBody] = useState("");
+  const [activeTab, setActiveTab] = useState<"headers" | "body">("headers");
 
   useEffect(() => {
     if (request) {
@@ -31,23 +24,26 @@ export default function RequestPanel({
       setHeaders(
         Object.entries(request.headers).length > 0
           ? Object.entries(request.headers).map(([key, value]) => ({ key, value }))
-          : [{ key: '', value: '' }]
+          : [{ key: "", value: "" }],
       );
       setBody(request.body);
     } else {
-      setName('New Request');
-      setMethod('GET');
-      setUrl('');
-      setHeaders([{ key: '', value: '' }]);
-      setBody('');
+      setName("New Request");
+      setMethod("GET");
+      setUrl("");
+      setHeaders([{ key: "", value: "" }]);
+      setBody("");
     }
   }, [request]);
 
   const handleSend = () => {
-    const headersObj = headers.reduce((acc, { key, value }) => {
-      if (key) acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
+    const headersObj = headers.reduce(
+      (acc, { key, value }) => {
+        if (key) acc[key] = value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
 
     onSend({
       id: request?.id,
@@ -61,10 +57,13 @@ export default function RequestPanel({
   };
 
   const handleSave = () => {
-    const headersObj = headers.reduce((acc, { key, value }) => {
-      if (key) acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
+    const headersObj = headers.reduce(
+      (acc, { key, value }) => {
+        if (key) acc[key] = value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
 
     onSave({
       id: request?.id,
@@ -78,10 +77,10 @@ export default function RequestPanel({
   };
 
   const addHeader = () => {
-    setHeaders([...headers, { key: '', value: '' }]);
+    setHeaders([...headers, { key: "", value: "" }]);
   };
 
-  const updateHeader = (index: number, field: 'key' | 'value', value: string) => {
+  const updateHeader = (index: number, field: "key" | "value", value: string) => {
     const newHeaders = [...headers];
     newHeaders[index][field] = value;
     setHeaders(newHeaders);
@@ -105,16 +104,8 @@ export default function RequestPanel({
           <button onClick={handleSave} className="btn btn-secondary btn-sm">
             Save
           </button>
-          <button
-            onClick={handleSend}
-            disabled={loading || !url}
-            className="btn btn-primary btn-sm"
-          >
-            {loading ? (
-              <span className="loading loading-spinner loading-xs"></span>
-            ) : (
-              'Send'
-            )}
+          <button onClick={handleSend} disabled={loading || !url} className="btn btn-primary btn-sm">
+            {loading ? <span className="loading loading-spinner loading-xs"></span> : "Send"}
           </button>
         </div>
         <div className="flex gap-2">
@@ -144,42 +135,36 @@ export default function RequestPanel({
       <div className="flex-1 flex flex-col">
         <div className="tabs tabs-boxed p-4">
           <button
-            className={`tab ${activeTab === 'headers' ? 'tab-active' : ''}`}
-            onClick={() => setActiveTab('headers')}
+            className={`tab ${activeTab === "headers" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("headers")}
           >
             Headers
           </button>
-          <button
-            className={`tab ${activeTab === 'body' ? 'tab-active' : ''}`}
-            onClick={() => setActiveTab('body')}
-          >
+          <button className={`tab ${activeTab === "body" ? "tab-active" : ""}`} onClick={() => setActiveTab("body")}>
             Body
           </button>
         </div>
 
         <div className="flex-1 p-4 overflow-y-auto">
-          {activeTab === 'headers' ? (
+          {activeTab === "headers" ? (
             <div>
               {headers.map((header, index) => (
                 <div key={index} className="flex gap-2 mb-2">
                   <input
                     type="text"
                     value={header.key}
-                    onChange={(e) => updateHeader(index, 'key', e.target.value)}
+                    onChange={(e) => updateHeader(index, "key", e.target.value)}
                     className="input input-bordered input-sm flex-1"
                     placeholder="Header name"
                   />
                   <input
                     type="text"
                     value={header.value}
-                    onChange={(e) => updateHeader(index, 'value', e.target.value)}
+                    onChange={(e) => updateHeader(index, "value", e.target.value)}
                     className="input input-bordered input-sm flex-1"
                     placeholder="Header value"
                   />
-                  <button
-                    onClick={() => removeHeader(index)}
-                    className="btn btn-ghost btn-sm"
-                  >
+                  <button onClick={() => removeHeader(index)} className="btn btn-ghost btn-sm">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
@@ -187,12 +172,7 @@ export default function RequestPanel({
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>

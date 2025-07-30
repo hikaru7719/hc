@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	port int
+	port          int
 	GetFrontendFS func() (fs.FS, error)
 )
 
@@ -40,10 +40,10 @@ var serveCmd = &cobra.Command{
 		}
 
 		srv := server.New(port, db, frontendFS)
-		
+
 		log.Printf("Starting HC server on port %d", port)
 		log.Printf("Open http://localhost:%d in your browser", port)
-		
+
 		return srv.Start()
 	},
 }

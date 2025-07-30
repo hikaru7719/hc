@@ -1,4 +1,4 @@
-import { Request, Folder } from '@/types';
+import type { Request, Folder } from "@/types";
 
 interface SidebarProps {
   requests: Request[];
@@ -22,11 +22,7 @@ export default function Sidebar({
       <div className="p-4 border-b border-base-300">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Requests</h2>
-          <button
-            onClick={onRefresh}
-            className="btn btn-sm btn-ghost"
-            title="Refresh"
-          >
+          <button onClick={onRefresh} className="btn btn-sm btn-ghost" title="Refresh">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
@@ -49,14 +45,9 @@ export default function Sidebar({
           {requests.map((request) => (
             <li key={request.id}>
               <div
-                className={`flex items-center justify-between ${
-                  selectedRequest?.id === request.id ? 'active' : ''
-                }`}
+                className={`flex items-center justify-between ${selectedRequest?.id === request.id ? "active" : ""}`}
               >
-                <button
-                  onClick={() => onSelectRequest(request)}
-                  className="flex-1 text-left"
-                >
+                <button onClick={() => onSelectRequest(request)} className="flex-1 text-left">
                   <span className="badge badge-sm mr-2">{request.method}</span>
                   <span className="text-sm">{request.name}</span>
                 </button>

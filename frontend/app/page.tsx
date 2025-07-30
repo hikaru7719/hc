@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import RequestPanel from '@/components/RequestPanel';
-import ResponsePanel from '@/components/ResponsePanel';
-import Sidebar from '@/components/Sidebar';
-import { Request, Response, Folder } from '@/types';
+import { useState, useEffect } from "react";
+import RequestPanel from "@/components/RequestPanel";
+import ResponsePanel from "@/components/ResponsePanel";
+import Sidebar from "@/components/Sidebar";
+import type { Request, Response, Folder } from "@/types";
 
 export default function Home() {
   const [requests, setRequests] = useState<Request[]>([]);
@@ -20,31 +20,31 @@ export default function Home() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch('/api/requests');
+      const res = await fetch("/api/requests");
       const data = await res.json();
       setRequests(data);
     } catch (error) {
-      console.error('Failed to fetch requests:', error);
+      console.error("Failed to fetch requests:", error);
     }
   };
 
   const fetchFolders = async () => {
     try {
-      const res = await fetch('/api/folders');
+      const res = await fetch("/api/folders");
       const data = await res.json();
       setFolders(data);
     } catch (error) {
-      console.error('Failed to fetch folders:', error);
+      console.error("Failed to fetch folders:", error);
     }
   };
 
   const handleSendRequest = async (request: Request) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/request', {
-        method: 'POST',
+      const res = await fetch("/api/request", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           method: request.method,
@@ -57,7 +57,7 @@ export default function Home() {
       const data = await res.json();
       setResponse(data);
     } catch (error) {
-      console.error('Failed to send request:', error);
+      console.error("Failed to send request:", error);
     } finally {
       setLoading(false);
     }
@@ -67,31 +67,31 @@ export default function Home() {
     try {
       if (request.id) {
         await fetch(`/api/requests/${request.id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(request),
         });
       } else {
-        await fetch('/api/requests', {
-          method: 'POST',
+        await fetch("/api/requests", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(request),
         });
       }
       await fetchRequests();
     } catch (error) {
-      console.error('Failed to save request:', error);
+      console.error("Failed to save request:", error);
     }
   };
 
   const handleDeleteRequest = async (id: number) => {
     try {
       await fetch(`/api/requests/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       await fetchRequests();
       if (selectedRequest?.id === id) {
@@ -99,7 +99,7 @@ export default function Home() {
         setResponse(null);
       }
     } catch (error) {
-      console.error('Failed to delete request:', error);
+      console.error("Failed to delete request:", error);
     }
   };
 
