@@ -66,9 +66,6 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           <button type="button" onClick={handleSave} className="btn btn-secondary btn-sm">
             Save
           </button>
-          <button type="button" onClick={handleCopyAsCurl} className="btn btn-ghost btn-sm" disabled={!state.url}>
-            {copiedCurl ? "Copied!" : "Copy as cURL"}
-          </button>
           <button
             type="button"
             onClick={handleSend}
@@ -76,6 +73,9 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
             className="btn btn-primary btn-sm"
           >
             {loading ? <span className="loading loading-spinner loading-xs"></span> : "Send"}
+          </button>
+          <button type="button" onClick={handleCopyAsCurl} className="btn btn-ghost btn-sm" disabled={!state.url}>
+            {copiedCurl ? "Copied!" : "Copy as cURL"}
           </button>
         </div>
         <div className="flex gap-2">
