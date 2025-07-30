@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/hc/hc/internal/logger"
+	customMiddleware "github.com/hc/hc/internal/middleware"
 	"github.com/hc/hc/internal/models"
 	"github.com/hc/hc/internal/proxy"
 	"github.com/hc/hc/internal/storage"
@@ -44,9 +45,16 @@ func (s *Server) Start() error {
 	// Request logging middleware
 	e.Use(logger.EchoMiddleware())
 
-	// CORS middleware
+	// Origin validation middleware (before CORS)
+	e.Use(customMiddleware.OriginValidator(s.port))
+
+	// CORS middleware - now only allows same origin
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: []string{
+			fmt.Sprintf("http://localhost:%d", s.port),
+			fmt.Sprintf("http://127.0.0.1:%d", s.port),
+			fmt.Sprintf("http://[::1]:%d", s.port),
+		},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 		AllowHeaders: []string{"Content-Type"},
 	}))
