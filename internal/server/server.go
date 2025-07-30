@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/hc/hc/internal/logger"
 	"github.com/hc/hc/internal/models"
 	"github.com/hc/hc/internal/proxy"
 	"github.com/hc/hc/internal/storage"
@@ -33,6 +35,14 @@ func New(port int, db *storage.DB, frontendFS fs.FS) *Server {
 
 func (s *Server) Start() error {
 	e := echo.New()
+	log := logger.Get()
+
+	// Disable Echo's default logger
+	e.HideBanner = true
+	e.HidePort = true
+
+	// Request logging middleware
+	e.Use(logger.EchoMiddleware())
 
 	// CORS middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -65,26 +75,35 @@ func (s *Server) Start() error {
 	e.GET("/*", s.handleStatic)
 
 	addr := fmt.Sprintf(":%d", s.port)
+	log.Info("Starting server", slog.String("address", addr))
 	return e.Start(addr)
 }
 
 // Proxy handlers
 func (s *Server) handleProxyRequest(c echo.Context) error {
+	log := logger.Get()
+	
 	var proxyReq proxy.ProxyRequest
 	if err := c.Bind(&proxyReq); err != nil {
+		log.Error("Failed to bind proxy request", slog.String("error", err.Error()))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
 	if err := proxy.ValidateURL(proxyReq.URL); err != nil {
+		log.Error("Invalid URL", slog.String("url", proxyReq.URL), slog.String("error", err.Error()))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	if err := proxy.ValidateMethod(proxyReq.Method); err != nil {
+		log.Error("Invalid HTTP method", slog.String("method", proxyReq.Method), slog.String("error", err.Error()))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
+	log.Info("Proxying request", slog.String("method", proxyReq.Method), slog.String("url", proxyReq.URL))
+	
 	resp, err := s.proxyClient.ProxyRequest(&proxyReq)
 	if err != nil {
+		log.Error("Proxy request failed", slog.String("error", err.Error()))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Failed to execute request: %v", err)})
 	}
 

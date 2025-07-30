@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 	"io/fs"
-	"log"
+	"log/slog"
 
+	"github.com/hc/hc/internal/logger"
 	"github.com/hc/hc/internal/server"
 	"github.com/hc/hc/internal/storage"
 	"github.com/spf13/cobra"
@@ -20,8 +21,12 @@ var serveCmd = &cobra.Command{
 	Short: "Start the HTTP client server",
 	Long:  `Start the local web server that hosts the HTTP client interface.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		log := logger.Get()
+		
+		log.Info("Initializing database")
 		db, err := storage.InitDB()
 		if err != nil {
+			log.Error("Failed to initialize database", slog.String("error", err.Error()))
 			return err
 		}
 		defer db.Close()
@@ -31,18 +36,20 @@ var serveCmd = &cobra.Command{
 			var err error
 			frontendFS, err = GetFrontendFS()
 			if err != nil {
-				log.Printf("Warning: Frontend files not embedded, will serve from filesystem: %v", err)
+				log.Warn("Frontend files not embedded, will serve from filesystem", slog.String("error", err.Error()))
 				frontendFS = nil
 			}
 		} else {
-			log.Printf("Warning: Frontend files not embedded, will serve from filesystem")
+			log.Warn("Frontend files not embedded, will serve from filesystem")
 			frontendFS = nil
 		}
 
 		srv := server.New(port, db, frontendFS)
 
-		log.Printf("Starting HC server on port %d", port)
-		log.Printf("Open http://localhost:%d in your browser", port)
+		log.Info("Starting HC server", 
+			slog.Int("port", port),
+			slog.String("url", fmt.Sprintf("http://localhost:%d", port)),
+		)
 
 		return srv.Start()
 	},
