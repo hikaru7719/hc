@@ -53,17 +53,17 @@ func (s *Server) Start() error {
 
 	// API routes
 	api := e.Group("/api")
-	
+
 	// Proxy request
 	api.POST("/request", s.handleProxyRequest)
-	
+
 	// Requests endpoints
 	api.GET("/requests", s.handleGetRequests)
 	api.POST("/requests", s.handleCreateRequest)
 	api.GET("/requests/:id", s.handleGetRequestByID)
 	api.PUT("/requests/:id", s.handleUpdateRequestByID)
 	api.DELETE("/requests/:id", s.handleDeleteRequestByID)
-	
+
 	// Folders endpoints
 	api.GET("/folders", s.handleGetFolders)
 	api.POST("/folders", s.handleCreateFolder)
@@ -82,7 +82,7 @@ func (s *Server) Start() error {
 // Proxy handlers
 func (s *Server) handleProxyRequest(c echo.Context) error {
 	log := logger.Get()
-	
+
 	var proxyReq proxy.ProxyRequest
 	if err := c.Bind(&proxyReq); err != nil {
 		log.Error("Failed to bind proxy request", slog.String("error", err.Error()))
@@ -100,7 +100,7 @@ func (s *Server) handleProxyRequest(c echo.Context) error {
 	}
 
 	log.Info("Proxying request", slog.String("method", proxyReq.Method), slog.String("url", proxyReq.URL))
-	
+
 	resp, err := s.proxyClient.ProxyRequest(&proxyReq)
 	if err != nil {
 		log.Error("Proxy request failed", slog.String("error", err.Error()))

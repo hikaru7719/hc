@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 	Long:  `Start the local web server that hosts the HTTP client interface.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log := logger.Get()
-		
+
 		log.Info("Initializing database")
 		db, err := storage.InitDB()
 		if err != nil {
@@ -46,7 +46,7 @@ var serveCmd = &cobra.Command{
 
 		srv := server.New(port, db, frontendFS)
 
-		log.Info("Starting HC server", 
+		log.Info("Starting HC server",
 			slog.Int("port", port),
 			slog.String("url", fmt.Sprintf("http://localhost:%d", port)),
 		)

@@ -165,7 +165,7 @@ func TestProxyRequest(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Add a small delay to ensure duration is > 0
 		time.Sleep(5 * time.Millisecond)
-		
+
 		// For POST requests, validate specific headers and body
 		if r.Method == "POST" {
 			// Check headers
@@ -371,15 +371,15 @@ func TestProxyRequestWithRedirect(t *testing.T) {
 
 func TestNewClient(t *testing.T) {
 	client := NewClient()
-	
+
 	if client == nil {
 		t.Fatal("NewClient() returned nil")
 	}
-	
+
 	if client.httpClient == nil {
 		t.Fatal("NewClient() httpClient is nil")
 	}
-	
+
 	// Check timeout is set
 	if client.httpClient.Timeout != 30*time.Second {
 		t.Errorf("Expected timeout 30s, got %v", client.httpClient.Timeout)

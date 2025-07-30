@@ -49,7 +49,7 @@ func EchoMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			start := time.Now()
-			
+
 			// Log request
 			defaultLogger.Info("request_started",
 				slog.String("method", c.Request().Method),
@@ -57,13 +57,13 @@ func EchoMiddleware() echo.MiddlewareFunc {
 				slog.String("remote_addr", c.RealIP()),
 				slog.String("user_agent", c.Request().UserAgent()),
 			)
-			
+
 			// Process request
 			err := next(c)
-			
+
 			// Calculate duration
 			duration := time.Since(start)
-			
+
 			// Get status code
 			status := c.Response().Status
 			if err != nil {
@@ -73,13 +73,13 @@ func EchoMiddleware() echo.MiddlewareFunc {
 					status = 500
 				}
 			}
-			
+
 			// Log response
 			logLevel := slog.LevelInfo
 			if status >= 400 {
 				logLevel = slog.LevelError
 			}
-			
+
 			defaultLogger.Log(c.Request().Context(), logLevel, "request_completed",
 				slog.String("method", c.Request().Method),
 				slog.String("path", c.Path()),
@@ -87,15 +87,14 @@ func EchoMiddleware() echo.MiddlewareFunc {
 				slog.Duration("duration", duration),
 				slog.Int64("bytes_out", c.Response().Size),
 			)
-			
+
 			if err != nil {
 				defaultLogger.Error("request_error",
 					slog.String("error", err.Error()),
 				)
 			}
-			
+
 			return err
 		}
 	}
 }
-
