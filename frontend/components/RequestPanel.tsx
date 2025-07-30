@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useRequestPanelReducer } from "@/hooks/useRequestPanelReducer";
 import type { Request } from "@/types";
 
 interface RequestPanelProps {
@@ -9,88 +10,32 @@ interface RequestPanelProps {
 }
 
 export default function RequestPanel({ request, onSend, onSave, loading }: RequestPanelProps) {
-  const [name, setName] = useState("");
-  const [method, setMethod] = useState("GET");
-  const [url, setUrl] = useState("");
-  const [headers, setHeaders] = useState<Array<{ id: string; key: string; value: string }>>([
-    { id: crypto.randomUUID(), key: "", value: "" },
-  ]);
-  const [body, setBody] = useState("");
-  const [activeTab, setActiveTab] = useState<"headers" | "body">("headers");
+  const {
+    state,
+    setName,
+    setMethod,
+    setUrl,
+    setBody,
+    setActiveTab,
+    addHeader,
+    updateHeader,
+    removeHeader,
+    resetFromRequest,
+    getRequestObject,
+  } = useRequestPanelReducer();
 
   useEffect(() => {
-    if (request) {
-      setName(request.name);
-      setMethod(request.method);
-      setUrl(request.url);
-      setHeaders(
-        Object.entries(request.headers).length > 0
-          ? Object.entries(request.headers).map(([key, value]) => ({ id: crypto.randomUUID(), key, value }))
-          : [{ id: crypto.randomUUID(), key: "", value: "" }],
-      );
-      setBody(request.body);
-    } else {
-      setName("New Request");
-      setMethod("GET");
-      setUrl("");
-      setHeaders([{ id: crypto.randomUUID(), key: "", value: "" }]);
-      setBody("");
-    }
-  }, [request]);
+    resetFromRequest(request);
+  }, [request, resetFromRequest]);
 
   const handleSend = () => {
-    const headersObj = headers.reduce(
-      (acc, { key, value }) => {
-        if (key) acc[key] = value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    onSend({
-      id: request?.id,
-      name,
-      folder_id: request?.folder_id || null,
-      method,
-      url,
-      headers: headersObj,
-      body,
-    });
+    onSend(getRequestObject(request));
   };
 
   const handleSave = () => {
-    const headersObj = headers.reduce(
-      (acc, { key, value }) => {
-        if (key) acc[key] = value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    onSave({
-      id: request?.id,
-      name,
-      folder_id: request?.folder_id || null,
-      method,
-      url,
-      headers: headersObj,
-      body,
-    });
+    onSave(getRequestObject(request));
   };
 
-  const addHeader = () => {
-    setHeaders([...headers, { id: crypto.randomUUID(), key: "", value: "" }]);
-  };
-
-  const updateHeader = (index: number, field: "key" | "value", value: string) => {
-    const newHeaders = [...headers];
-    newHeaders[index][field] = value;
-    setHeaders(newHeaders);
-  };
-
-  const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_, i) => i !== index));
-  };
 
   return (
     <div className="h-full flex flex-col">
@@ -98,7 +43,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
         <div className="flex gap-2 mb-3">
           <input
             type="text"
-            value={name}
+            value={state.name}
             onChange={(e) => setName(e.target.value)}
             className="input input-bordered input-sm flex-1"
             placeholder="Request name"
@@ -106,13 +51,13 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           <button type="button" onClick={handleSave} className="btn btn-secondary btn-sm">
             Save
           </button>
-          <button type="button" onClick={handleSend} disabled={loading || !url} className="btn btn-primary btn-sm">
+          <button type="button" onClick={handleSend} disabled={loading || !state.url} className="btn btn-primary btn-sm">
             {loading ? <span className="loading loading-spinner loading-xs"></span> : "Send"}
           </button>
         </div>
         <div className="flex gap-2">
           <select
-            value={method}
+            value={state.method}
             onChange={(e) => setMethod(e.target.value)}
             className="select select-bordered select-sm w-32"
           >
@@ -126,7 +71,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
           </select>
           <input
             type="text"
-            value={url}
+            value={state.url}
             onChange={(e) => setUrl(e.target.value)}
             className="input input-bordered input-sm flex-1"
             placeholder="https://api.example.com/endpoint"
@@ -138,14 +83,14 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
         <div className="tabs tabs-boxed p-4">
           <button
             type="button"
-            className={`tab ${activeTab === "headers" ? "tab-active" : ""}`}
+            className={`tab ${state.activeTab === "headers" ? "tab-active" : ""}`}
             onClick={() => setActiveTab("headers")}
           >
             Headers
           </button>
           <button
             type="button"
-            className={`tab ${activeTab === "body" ? "tab-active" : ""}`}
+            className={`tab ${state.activeTab === "body" ? "tab-active" : ""}`}
             onClick={() => setActiveTab("body")}
           >
             Body
@@ -153,9 +98,9 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
         </div>
 
         <div className="flex-1 p-4 overflow-y-auto">
-          {activeTab === "headers" ? (
+          {state.activeTab === "headers" ? (
             <div>
-              {headers.map((header, index) => (
+              {state.headers.map((header, index) => (
                 <div key={header.id} className="flex gap-2 mb-2">
                   <input
                     type="text"
@@ -191,7 +136,7 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
             </div>
           ) : (
             <textarea
-              value={body}
+              value={state.body}
               onChange={(e) => setBody(e.target.value)}
               className="textarea textarea-bordered w-full h-full font-mono text-sm"
               placeholder="Request body (JSON, XML, etc.)"

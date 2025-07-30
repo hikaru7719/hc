@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import RequestPanel from "@/components/RequestPanel";
 import ResponsePanel from "@/components/ResponsePanel";
 import Sidebar from "@/components/Sidebar";
-import type { Request, Response } from "@/types";
+import { useAppReducer } from "@/hooks/useAppReducer";
+import type { Request } from "@/types";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -17,16 +17,21 @@ const fetcher = async (url: string) => {
 
 export default function Home() {
   const { data: requests = [], error: requestsError } = useSWR<Request[]>("/api/requests", fetcher);
-  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
-  const [response, setResponse] = useState<Response | null>(null);
-  const [loading, setLoading] = useState(false);
+  const {
+    state,
+    setSelectedRequest,
+    clearRequestAndResponse,
+    startRequest,
+    requestSuccess,
+    requestFailure,
+  } = useAppReducer();
 
   if (requestsError) {
     console.error("Failed to fetch requests:", requestsError);
   }
 
   const handleSendRequest = async (request: Request) => {
-    setLoading(true);
+    startRequest();
     try {
       const res = await fetch("/api/request", {
         method: "POST",
@@ -42,11 +47,10 @@ export default function Home() {
       });
 
       const data = await res.json();
-      setResponse(data);
+      requestSuccess(data);
     } catch (error) {
       console.error("Failed to send request:", error);
-    } finally {
-      setLoading(false);
+      requestFailure();
     }
   };
 
@@ -81,9 +85,8 @@ export default function Home() {
         method: "DELETE",
       });
       await mutate("/api/requests");
-      if (selectedRequest?.id === id) {
-        setSelectedRequest(null);
-        setResponse(null);
+      if (state.selectedRequest?.id === id) {
+        clearRequestAndResponse();
       }
     } catch (error) {
       console.error("Failed to delete request:", error);
@@ -94,7 +97,7 @@ export default function Home() {
     <div className="flex h-screen bg-base-200">
       <Sidebar
         requests={requests}
-        selectedRequest={selectedRequest}
+        selectedRequest={state.selectedRequest}
         onSelectRequest={setSelectedRequest}
         onDeleteRequest={handleDeleteRequest}
         onRefresh={() => {
@@ -104,14 +107,14 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
         <div className="w-1/2 border-r border-base-300 overflow-hidden">
           <RequestPanel
-            request={selectedRequest}
+            request={state.selectedRequest}
             onSend={handleSendRequest}
             onSave={handleSaveRequest}
-            loading={loading}
+            loading={state.loading}
           />
         </div>
         <div className="w-1/2 overflow-hidden">
-          <ResponsePanel response={response} loading={loading} />
+          <ResponsePanel response={state.response} loading={state.loading} />
         </div>
       </div>
     </div>
