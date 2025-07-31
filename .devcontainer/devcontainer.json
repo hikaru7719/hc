@@ -20,7 +20,8 @@
 		"source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind"
 	],
 	"containerEnv": {
-		"CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+		"CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+		"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "true"
 	},
 	"remoteUser": "vscode",
 	"postCreateCommand": ".devcontainer/postCreateCommand.sh"
