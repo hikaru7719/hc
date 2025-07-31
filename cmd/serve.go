@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
+	"log/slog"
+
 	"github.com/hc/hc/internal/logger"
 	"github.com/hc/hc/internal/server"
 	"github.com/hc/hc/internal/storage"
 	"github.com/spf13/cobra"
-	"io/fs"
-	"log/slog"
 )
 
 var (

@@ -2,10 +2,11 @@ package logger
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
 	"log/slog"
 	"os"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 var defaultLogger *slog.Logger

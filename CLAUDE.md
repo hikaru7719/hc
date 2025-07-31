@@ -38,10 +38,6 @@ make build
 make run
 # Or directly: ./build/hc serve
 
-# Development mode with hot reload
-make dev              # Backend with air hot reload
-make dev-frontend     # Frontend dev server on port 3000
-
 # Run tests
 make test             # Runs both Go and frontend tests
 go test ./...         # Go tests only

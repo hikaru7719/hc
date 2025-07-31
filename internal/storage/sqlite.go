@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/hc/hc/internal/logger"
-	"github.com/hc/hc/internal/models"
-	_ "github.com/mattn/go-sqlite3"
 	"log/slog"
 	"os"
 	"path/filepath"
+
+	"github.com/hc/hc/internal/logger"
+	"github.com/hc/hc/internal/models"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (

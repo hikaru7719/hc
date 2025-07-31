@@ -3,12 +3,13 @@ package proxy
 import (
 	"bytes"
 	"errors"
-	"github.com/hc/hc/internal/models"
 	"io"
 	"net/http"
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/hc/hc/internal/models"
 )
 
 type Client struct {

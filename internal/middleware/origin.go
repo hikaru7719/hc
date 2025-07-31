@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/hc/hc/internal/logger"
-	"github.com/hc/hc/internal/models"
-	"github.com/labstack/echo/v4"
 	"log/slog"
 	"net/http"
 	"net/url"
+
+	"github.com/hc/hc/internal/logger"
+	"github.com/hc/hc/internal/models"
+	"github.com/labstack/echo/v4"
 )
 
 func OriginValidator(allowedPort int) echo.MiddlewareFunc {

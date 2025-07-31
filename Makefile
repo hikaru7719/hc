@@ -55,22 +55,6 @@ run: build
 	@echo "$(YELLOW)Starting HC...$(NC)"
 	./$(BUILD_DIR)/$(BINARY_NAME)
 
-# Development mode - run backend with hot reload
-dev:
-	@echo "$(YELLOW)Starting development mode...$(NC)"
-	@if command -v air > /dev/null; then \
-		air; \
-	else \
-		echo "Installing air for hot reload..."; \
-		go install github.com/air-verse/air@latest; \
-		air; \
-	fi
-
-# Run frontend development server
-dev-frontend:
-	@echo "$(YELLOW)Starting frontend development server...$(NC)"
-	@cd $(FRONTEND_DIR) && $(NPM_CMD) run dev
-
 # Run tests
 test:
 	@echo "$(YELLOW)Running tests...$(NC)"
@@ -92,9 +76,8 @@ test-coverage:
 lint:
 	@echo "$(YELLOW)Running linters...$(NC)"
 	$(GO_CMD) vet ./...
-	$(GO_CMD) fmt ./...
-	@cd $(FRONTEND_DIR) && $(NPM_CMD) run lint
-	@cd $(FRONTEND_DIR) && $(NPM_CMD) run format
+	goimports -w .
+	@cd $(FRONTEND_DIR) && $(NPM_CMD) run check:write
 
 # Install dependencies
 deps:
