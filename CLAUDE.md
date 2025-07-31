@@ -29,6 +29,7 @@ go test ./internal/storage -v  # Run specific package tests
 make lint             # Run linters (go vet, go fmt, golangci-lint if installed, npm lint)
 go fmt ./...          # Format Go code
 go vet ./...          # Check Go code
+go build -o hc main.go # Build go binary
 
 # Clean build artifacts
 make clean
@@ -62,16 +63,36 @@ make build-all
 
 ### Key Implementation Details
 - Frontend files are embedded using `go:embed` in `embed.go`
-- CORS is handled in `corsMiddleware` for API endpoints
 - SQLite database is initialized in user's home directory (`~/.hc/hc.db`)
 - Static file serving falls back to index.html for client-side routing
 
 ### Code Policy
 
+#### Common
+
 - Do not use comment if you can understand code to read program like simple logic.
   - Use comment with complex code.
 - Do not define unnecessary variable.
   - Use direct assignment with literal
-- Remove blank line　in function. You should not use blank line in function.
+- Remove blank line in a function. You should not use blank line in a function.
 - Keep considering best code.
 - Keep function small.
+
+#### Frontend
+
+- Avoid using useEffect function.
+- Avoid using a lot of useState function.
+  - make useReducer function to aggregate useState.
+- Avoid using useCallback.
+- Avoid using try-catch code and handle error globally.
+- Consider to split large React components.
+- Define constant variable.
+- Avoid using null or undefined or optional param.
+- Use functional idiom like map, filter.
+- Use async-await pattern, avoid using Promise chain like then, catch.
+
+#### Backend
+
+- Make test code and use table driven test.
+- Do not use unnecessary wrap error by using fmt.Errorf
+- Avoid using init function. init function order is difficult to understand.

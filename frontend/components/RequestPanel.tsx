@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRequestPanelReducer } from "@/hooks/useRequestPanelReducer";
+import HeadersEditor from "@/components/HeadersEditor";
 import type { Request } from "@/types";
 import { generateCurlCommand } from "@/utils/curlGenerator";
+import { HTTP_METHOD_LIST, COPY_FEEDBACK_DURATION } from "@/constants/http";
 
 interface RequestPanelProps {
   request: Request | null;
@@ -21,15 +23,10 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
     addHeader,
     updateHeader,
     removeHeader,
-    resetFromRequest,
     getRequestObject,
-  } = useRequestPanelReducer();
+  } = useRequestPanelReducer(request);
 
   const [copiedCurl, setCopiedCurl] = useState(false);
-
-  useEffect(() => {
-    resetFromRequest(request);
-  }, [request, resetFromRequest]);
 
   const handleSend = () => {
     onSend(getRequestObject(request));
@@ -43,13 +40,9 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
     const requestObj = getRequestObject(request);
     const curlCommand = generateCurlCommand(requestObj);
 
-    try {
-      await navigator.clipboard.writeText(curlCommand);
-      setCopiedCurl(true);
-      setTimeout(() => setCopiedCurl(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy to clipboard:", err);
-    }
+    await navigator.clipboard.writeText(curlCommand);
+    setCopiedCurl(true);
+    setTimeout(() => setCopiedCurl(false), COPY_FEEDBACK_DURATION);
   };
 
   return (
@@ -84,13 +77,11 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
             onChange={(e) => setMethod(e.target.value)}
             className="select select-bordered select-sm w-32"
           >
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-            <option value="PATCH">PATCH</option>
-            <option value="HEAD">HEAD</option>
-            <option value="OPTIONS">OPTIONS</option>
+            {HTTP_METHOD_LIST.map((method) => (
+              <option key={method} value={method}>
+                {method}
+              </option>
+            ))}
           </select>
           <input
             type="text"
@@ -122,41 +113,12 @@ export default function RequestPanel({ request, onSend, onSave, loading }: Reque
 
         <div className="flex-1 p-4 overflow-y-auto">
           {state.activeTab === "headers" ? (
-            <div>
-              {state.headers.map((header, index) => (
-                <div key={header.id} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={header.key}
-                    onChange={(e) => updateHeader(index, "key", e.target.value)}
-                    className="input input-bordered input-sm flex-1"
-                    placeholder="Header name"
-                  />
-                  <input
-                    type="text"
-                    value={header.value}
-                    onChange={(e) => updateHeader(index, "value", e.target.value)}
-                    className="input input-bordered input-sm flex-1"
-                    placeholder="Header value"
-                  />
-                  <button type="button" onClick={() => removeHeader(index)} className="btn btn-ghost btn-sm">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <title>Remove</title>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={addHeader} className="btn btn-ghost btn-sm">
-                + Add Header
-              </button>
-            </div>
+            <HeadersEditor
+              headers={state.headers}
+              updateHeader={updateHeader}
+              removeHeader={removeHeader}
+              addHeader={addHeader}
+            />
           ) : (
             <textarea
               value={state.body}

@@ -84,7 +84,7 @@ func (s *Server) handleProxyRequest(c echo.Context) error {
 	resp, err := s.proxyClient.ProxyRequest(&proxyReq)
 	if err != nil {
 		logger.Get().Error("Proxy request failed", slog.String("error", err.Error()))
-		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse(fmt.Sprintf("Failed to execute request: %v", err)))
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to execute request"))
 	}
 	return c.JSON(http.StatusOK, resp)
 }
@@ -128,7 +128,6 @@ func (s *Server) handleUpdateRequestByID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request ID"))
 	}
-
 	var request models.Request
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))

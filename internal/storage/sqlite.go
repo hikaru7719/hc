@@ -57,16 +57,16 @@ func InitDB() (*DB, error) {
 	log := logger.Get()
 	dbPath, err := getDBPath()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get database path: %w", err)
+		return nil, err
 	}
 	log.Info("Opening database", slog.String("path", dbPath))
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, err
 	}
 	if err := db.Ping(); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to ping database: %w", err)
+		return nil, err
 	}
 	wrapper := &DB{
 		DB:  db,
@@ -74,7 +74,7 @@ func InitDB() (*DB, error) {
 	}
 	if err := wrapper.createTables(); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to create tables: %w", err)
+		return nil, err
 	}
 	log.Info("Database initialized successfully")
 	return wrapper, nil
@@ -109,7 +109,7 @@ func (db *DB) createTables() error {
 func (db *DB) WithTx(ctx context.Context, fn func(*sql.Tx) error) error {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
+		return err
 	}
 	if err := fn(tx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
@@ -118,7 +118,7 @@ func (db *DB) WithTx(ctx context.Context, fn func(*sql.Tx) error) error {
 		return err
 	}
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return err
 	}
 	return nil
 }
@@ -128,11 +128,11 @@ func (db *DB) CreateFolder(folder *models.Folder) error {
 	result, err := db.Exec(insertFolderQuery, folder.Name, folder.ParentID)
 	if err != nil {
 		db.log.Error("Failed to create folder", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to create folder: %w", err)
+		return err
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("failed to get last insert ID: %w", err)
+		return err
 	}
 	folder.ID = int(id)
 	return db.GetFolder(folder.ID, folder)
@@ -151,7 +151,7 @@ func (db *DB) GetFolder(id int, folder *models.Folder) error {
 	}
 	if err != nil {
 		db.log.Error("Failed to get folder", slog.Int("id", id), slog.String("error", err.Error()))
-		return fmt.Errorf("failed to get folder: %w", err)
+		return err
 	}
 	return nil
 }
@@ -160,10 +160,10 @@ func (db *DB) GetFolders() ([]models.Folder, error) {
 	rows, err := db.Query(selectFoldersQuery)
 	if err != nil {
 		db.log.Error("Failed to get folders", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("failed to get folders: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
-	folders := make([]models.Folder, 0)
+	var folders []models.Folder
 	for rows.Next() {
 		var folder models.Folder
 		if err := rows.Scan(
@@ -173,12 +173,12 @@ func (db *DB) GetFolders() ([]models.Folder, error) {
 			&folder.CreatedAt,
 			&folder.UpdatedAt,
 		); err != nil {
-			return nil, fmt.Errorf("failed to scan folder: %w", err)
+			return nil, err
 		}
 		folders = append(folders, folder)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating folders: %w", err)
+		return nil, err
 	}
 	return folders, nil
 }
@@ -188,11 +188,11 @@ func (db *DB) UpdateFolder(folder *models.Folder) error {
 	result, err := db.Exec(updateFolderQuery, folder.Name, folder.ParentID, folder.ID)
 	if err != nil {
 		db.log.Error("Failed to update folder", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to update folder: %w", err)
+		return err
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
+		return err
 	}
 	if rows == 0 {
 		return fmt.Errorf("folder not found")
@@ -205,11 +205,11 @@ func (db *DB) DeleteFolder(id int) error {
 	result, err := db.Exec(deleteFolderQuery, id)
 	if err != nil {
 		db.log.Error("Failed to delete folder", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to delete folder: %w", err)
+		return err
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
+		return err
 	}
 	if rows == 0 {
 		return fmt.Errorf("folder not found")
@@ -221,7 +221,7 @@ func (db *DB) CreateRequest(request *models.Request) error {
 	db.log.Info("Creating request", slog.String("name", request.Name))
 	headersJSON, err := serializeHeaders(request.Headers)
 	if err != nil {
-		return fmt.Errorf("failed to serialize headers: %w", err)
+		return err
 	}
 	result, err := db.Exec(insertRequestQuery,
 		request.Name,
@@ -233,11 +233,11 @@ func (db *DB) CreateRequest(request *models.Request) error {
 	)
 	if err != nil {
 		db.log.Error("Failed to create request", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to create request: %w", err)
+		return err
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("failed to get last insert ID: %w", err)
+		return err
 	}
 	request.ID = int(id)
 	return db.GetRequest(request.ID, request)
@@ -261,11 +261,11 @@ func (db *DB) GetRequest(id int, request *models.Request) error {
 	}
 	if err != nil {
 		db.log.Error("Failed to get request", slog.Int("id", id), slog.String("error", err.Error()))
-		return fmt.Errorf("failed to get request: %w", err)
+		return err
 	}
 	headers, err := deserializeHeaders(headersStr)
 	if err != nil {
-		return fmt.Errorf("failed to deserialize headers: %w", err)
+		return err
 	}
 	request.Headers = headers
 	return nil
@@ -275,10 +275,10 @@ func (db *DB) GetRequests() ([]models.Request, error) {
 	rows, err := db.Query(selectRequestsQuery)
 	if err != nil {
 		db.log.Error("Failed to get requests", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("failed to get requests: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
-	requests := make([]models.Request, 0)
+	var requests []models.Request
 	for rows.Next() {
 		var request models.Request
 		var headersStr string
@@ -293,7 +293,7 @@ func (db *DB) GetRequests() ([]models.Request, error) {
 			&request.CreatedAt,
 			&request.UpdatedAt,
 		); err != nil {
-			return nil, fmt.Errorf("failed to scan request: %w", err)
+			return nil, err
 		}
 		headers, err := deserializeHeaders(headersStr)
 		if err != nil {
@@ -303,7 +303,7 @@ func (db *DB) GetRequests() ([]models.Request, error) {
 		requests = append(requests, request)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating requests: %w", err)
+		return nil, err
 	}
 	return requests, nil
 }
@@ -312,7 +312,7 @@ func (db *DB) UpdateRequest(request *models.Request) error {
 	db.log.Info("Updating request", slog.Int("id", request.ID))
 	headersJSON, err := serializeHeaders(request.Headers)
 	if err != nil {
-		return fmt.Errorf("failed to serialize headers: %w", err)
+		return err
 	}
 	result, err := db.Exec(updateRequestQuery,
 		request.Name,
@@ -325,11 +325,11 @@ func (db *DB) UpdateRequest(request *models.Request) error {
 	)
 	if err != nil {
 		db.log.Error("Failed to update request", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to update request: %w", err)
+		return err
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
+		return err
 	}
 	if rows == 0 {
 		return fmt.Errorf("request not found")
@@ -342,11 +342,11 @@ func (db *DB) DeleteRequest(id int) error {
 	result, err := db.Exec(deleteRequestQuery, id)
 	if err != nil {
 		db.log.Error("Failed to delete request", slog.String("error", err.Error()))
-		return fmt.Errorf("failed to delete request: %w", err)
+		return err
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
+		return err
 	}
 	if rows == 0 {
 		return fmt.Errorf("request not found")
@@ -366,10 +366,10 @@ func serializeHeaders(headers map[string]string) (string, error) {
 }
 
 func deserializeHeaders(headersStr string) (map[string]string, error) {
-	headers := make(map[string]string)
 	if headersStr == "" {
-		return headers, nil
+		return make(map[string]string), nil
 	}
+	var headers map[string]string
 	if err := json.Unmarshal([]byte(headersStr), &headers); err != nil {
 		return nil, err
 	}

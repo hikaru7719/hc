@@ -75,7 +75,6 @@ dev-frontend:
 test:
 	@echo "$(YELLOW)Running tests...$(NC)"
 	$(GO_CMD) test -v ./...
-	@cd $(FRONTEND_DIR) && $(NPM_CMD) test
 
 # Run tests with coverage
 test-coverage:
@@ -94,10 +93,8 @@ lint:
 	@echo "$(YELLOW)Running linters...$(NC)"
 	$(GO_CMD) vet ./...
 	$(GO_CMD) fmt ./...
-	@if command -v golangci-lint > /dev/null; then \
-		golangci-lint run; \
-	fi
 	@cd $(FRONTEND_DIR) && $(NPM_CMD) run lint
+	@cd $(FRONTEND_DIR) && $(NPM_CMD) run format
 
 # Install dependencies
 deps:

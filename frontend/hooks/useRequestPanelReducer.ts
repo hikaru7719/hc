@@ -1,5 +1,6 @@
-import { useReducer, useCallback } from "react";
+import { useReducer } from "react";
 import type { Request } from "@/types";
+import { DEFAULT_METHOD, DEFAULT_REQUEST_NAME } from "@/constants/http";
 
 interface RequestPanelState {
   name: string;
@@ -19,12 +20,11 @@ type RequestPanelAction =
   | { type: "SET_ACTIVE_TAB"; payload: "headers" | "body" }
   | { type: "ADD_HEADER" }
   | { type: "UPDATE_HEADER"; payload: { index: number; field: "key" | "value"; value: string } }
-  | { type: "REMOVE_HEADER"; payload: number }
-  | { type: "RESET_FROM_REQUEST"; payload: Request | null };
+  | { type: "REMOVE_HEADER"; payload: number };
 
 const initialState: RequestPanelState = {
-  name: "New Request",
-  method: "GET",
+  name: DEFAULT_REQUEST_NAME,
+  method: DEFAULT_METHOD,
   url: "",
   headers: [{ id: crypto.randomUUID(), key: "", value: "" }],
   body: "",
@@ -60,81 +60,63 @@ function requestPanelReducer(state: RequestPanelState, action: RequestPanelActio
         ...state,
         headers: state.headers.filter((_, i) => i !== action.payload),
       };
-    case "RESET_FROM_REQUEST": {
-      const request = action.payload;
-      if (request) {
-        return {
-          name: request.name,
-          method: request.method,
-          url: request.url,
-          headers:
-            Object.entries(request.headers).length > 0
-              ? Object.entries(request.headers).map(([key, value]) => ({
-                  id: crypto.randomUUID(),
-                  key,
-                  value,
-                }))
-              : [{ id: crypto.randomUUID(), key: "", value: "" }],
-          body: request.body,
-          activeTab: state.activeTab,
-        };
-      }
-      return {
-        ...initialState,
-        activeTab: state.activeTab,
-      };
-    }
     default:
       return state;
   }
 }
 
-export function useRequestPanelReducer() {
-  const [state, dispatch] = useReducer(requestPanelReducer, initialState);
+export function useRequestPanelReducer(request: Request | null) {
+  const initialStateFromRequest = request
+    ? {
+        name: request.name,
+        method: request.method,
+        url: request.url,
+        headers:
+          Object.entries(request.headers).length > 0
+            ? Object.entries(request.headers).map(([key, value]) => ({
+                id: crypto.randomUUID(),
+                key,
+                value,
+              }))
+            : [{ id: crypto.randomUUID(), key: "", value: "" }],
+        body: request.body,
+        activeTab: "headers" as const,
+      }
+    : initialState;
 
-  const setName = useCallback((name: string) => dispatch({ type: "SET_NAME", payload: name }), []);
-  const setMethod = useCallback((method: string) => dispatch({ type: "SET_METHOD", payload: method }), []);
-  const setUrl = useCallback((url: string) => dispatch({ type: "SET_URL", payload: url }), []);
-  const setHeaders = useCallback(
-    (headers: Array<{ id: string; key: string; value: string }>) => dispatch({ type: "SET_HEADERS", payload: headers }),
-    [],
-  );
-  const setBody = useCallback((body: string) => dispatch({ type: "SET_BODY", payload: body }), []);
-  const setActiveTab = useCallback((tab: "headers" | "body") => dispatch({ type: "SET_ACTIVE_TAB", payload: tab }), []);
-  const addHeader = useCallback(() => dispatch({ type: "ADD_HEADER" }), []);
-  const updateHeader = useCallback(
-    (index: number, field: "key" | "value", value: string) =>
-      dispatch({ type: "UPDATE_HEADER", payload: { index, field, value } }),
-    [],
-  );
-  const removeHeader = useCallback((index: number) => dispatch({ type: "REMOVE_HEADER", payload: index }), []);
-  const resetFromRequest = useCallback(
-    (request: Request | null) => dispatch({ type: "RESET_FROM_REQUEST", payload: request }),
-    [],
-  );
+  const [state, dispatch] = useReducer(requestPanelReducer, initialStateFromRequest);
 
-  const getRequestObject = useCallback(
-    (request: Request | null) => {
-      const headersObj = state.headers.reduce(
-        (acc, { key, value }) => {
-          if (key) acc[key] = value;
-          return acc;
-        },
-        {} as Record<string, string>,
-      );
+  const setName = (name: string) => dispatch({ type: "SET_NAME", payload: name });
+  const setMethod = (method: string) => dispatch({ type: "SET_METHOD", payload: method });
+  const setUrl = (url: string) => dispatch({ type: "SET_URL", payload: url });
+  const setHeaders = (headers: Array<{ id: string; key: string; value: string }>) =>
+    dispatch({ type: "SET_HEADERS", payload: headers });
+  const setBody = (body: string) => dispatch({ type: "SET_BODY", payload: body });
+  const setActiveTab = (tab: "headers" | "body") => dispatch({ type: "SET_ACTIVE_TAB", payload: tab });
+  const addHeader = () => dispatch({ type: "ADD_HEADER" });
+  const updateHeader = (index: number, field: "key" | "value", value: string) =>
+    dispatch({ type: "UPDATE_HEADER", payload: { index, field, value } });
+  const removeHeader = (index: number) => dispatch({ type: "REMOVE_HEADER", payload: index });
 
-      return {
-        id: request?.id,
-        name: state.name,
-        folder_id: request?.folder_id || null,
-        method: state.method,
-        url: state.url,
-        headers: headersObj,
-        body: state.body,
-      };
-    },
-    [state],
-  );
+  const getRequestObject = (request: Request | null) => {
+    const headersObj = state.headers.reduce(
+      (acc, { key, value }) => {
+        if (key) acc[key] = value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    return {
+      id: request?.id,
+      name: state.name,
+      folder_id: request?.folder_id || null,
+      method: state.method,
+      url: state.url,
+      headers: headersObj,
+      body: state.body,
+    };
+  };
 
   return {
     state,
@@ -147,7 +129,6 @@ export function useRequestPanelReducer() {
     addHeader,
     updateHeader,
     removeHeader,
-    resetFromRequest,
     getRequestObject,
   };
 }

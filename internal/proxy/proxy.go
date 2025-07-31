@@ -6,6 +6,7 @@ import (
 	"github.com/hc/hc/internal/models"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 )
@@ -43,13 +44,9 @@ func (c *Client) ExecuteRequest(req *models.Request) (*models.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	headers := make(map[string]string)
-	for key, values := range resp.Header {
-		headers[key] = strings.Join(values, ", ")
-	}
 	return &models.Response{
 		StatusCode: resp.StatusCode,
-		Headers:    headers,
+		Headers:    CopyHeaders(resp.Header),
 		Body:       string(body),
 		Duration:   time.Since(start).Milliseconds(),
 	}, nil
@@ -82,11 +79,9 @@ func ValidateURL(url string) error {
 }
 
 func ValidateMethod(method string) error {
-	method = strings.ToUpper(method)
-	for _, valid := range []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"} {
-		if method == valid {
-			return nil
-		}
+	validMethods := []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"}
+	if slices.Contains(validMethods, strings.ToUpper(method)) {
+		return nil
 	}
 	return errors.New("invalid HTTP method: " + method)
 }

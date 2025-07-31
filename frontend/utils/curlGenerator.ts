@@ -1,10 +1,11 @@
 import type { Request } from "@/types";
+import { HTTP_METHODS, METHODS_WITH_BODY } from "@/constants/http";
 
 export function generateCurlCommand(request: Request): string {
   const parts: string[] = ["curl"];
 
   // Method (default is GET, so only add if not GET)
-  if (request.method && request.method !== "GET") {
+  if (request.method && request.method !== HTTP_METHODS.GET) {
     parts.push(`-X ${request.method}`);
   }
 
@@ -20,7 +21,7 @@ export function generateCurlCommand(request: Request): string {
   }
 
   // Body
-  if (request.body && ["POST", "PUT", "PATCH"].includes(request.method || "")) {
+  if (request.body && request.method && (METHODS_WITH_BODY as readonly string[]).includes(request.method)) {
     // Escape quotes and newlines in body
     const escapedBody = request.body
       .replace(/\\/g, "\\\\")

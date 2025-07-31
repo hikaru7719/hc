@@ -8,8 +8,7 @@ import type { Request } from "@/types";
 
 export default function HomePage() {
   const { data: requests = [], error: requestsError } = useSWR<Request[]>(API_ENDPOINTS.REQUESTS, fetcher);
-  const { state, setSelectedRequest, clearRequestAndResponse, startRequest, requestSuccess, requestFailure } =
-    useAppReducer();
+  const { state, setSelectedRequest, clearRequestAndResponse, startRequest, requestSuccess } = useAppReducer();
 
   if (requestsError) {
     console.error("Failed to fetch requests:", requestsError);
@@ -17,12 +16,8 @@ export default function HomePage() {
 
   const handleSendRequest = async (request: Request) => {
     startRequest();
-    try {
-      const response = await proxyApi.sendRequest(request);
-      requestSuccess(response);
-    } catch {
-      requestFailure();
-    }
+    const response = await proxyApi.sendRequest(request);
+    requestSuccess(response);
   };
 
   const handleSaveRequest = async (request: Request) => {

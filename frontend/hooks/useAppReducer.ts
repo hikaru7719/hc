@@ -14,7 +14,7 @@ type AppAction =
   | { type: "CLEAR_REQUEST_AND_RESPONSE" }
   | { type: "REQUEST_START" }
   | { type: "REQUEST_SUCCESS"; payload: Response }
-  | { type: "REQUEST_FAILURE" };
+  | { type: "REQUEST_FAILURE"; payload?: string };
 
 const initialState: AppState = {
   selectedRequest: null,
@@ -70,8 +70,8 @@ export function useAppReducer() {
     dispatch({ type: "REQUEST_SUCCESS", payload: response });
   };
 
-  const requestFailure = () => {
-    dispatch({ type: "REQUEST_FAILURE" });
+  const requestFailure = (error?: string) => {
+    dispatch({ type: "REQUEST_FAILURE", payload: error });
   };
 
   return {
