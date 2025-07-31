@@ -42,13 +42,19 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto">
         <ul className="menu p-2">
           {requests.map((request) => (
-            <li key={request.id}>
+            <li key={request.id} className="w-full">
               <div
-                className={`flex items-center justify-between ${selectedRequest?.id === request.id ? "active" : ""}`}
+                className={`flex items-center justify-between w-full px-2 py-1.5 rounded-lg hover:bg-base-200 ${selectedRequest?.id === request.id ? "bg-base-200" : ""}`}
               >
-                <button type="button" onClick={() => onSelectRequest(request)} className="flex-1 text-left">
-                  <span className="badge badge-sm mr-2">{request.method}</span>
-                  <span className="text-sm">{request.name}</span>
+                <button
+                  type="button"
+                  onClick={() => onSelectRequest(request)}
+                  className="flex items-center flex-1 min-w-0 text-left"
+                >
+                  <span className="badge badge-sm badge-primary flex-shrink-0 w-16 justify-center">
+                    {request.method}
+                  </span>
+                  <span className="text-sm ml-2 truncate">{request.name}</span>
                 </button>
                 {request.id && (
                   <button
@@ -57,7 +63,7 @@ export default function Sidebar({
                       e.stopPropagation();
                       if (request.id) onDeleteRequest(request.id);
                     }}
-                    className="btn btn-ghost btn-xs"
+                    className="btn btn-ghost btn-xs flex-shrink-0 ml-2"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
