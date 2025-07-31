@@ -65,3 +65,13 @@ make build-all
 - CORS is handled in `corsMiddleware` for API endpoints
 - SQLite database is initialized in user's home directory (`~/.hc/hc.db`)
 - Static file serving falls back to index.html for client-side routing
+
+### Code Policy
+
+- Do not use comment if you can understand code to read program like simple logic.
+  - Use comment with complex code.
+- Do not define unnecessary variable.
+  - Use direct assignment with literal
+- Remove blank line　in function. You should not use blank line in function.
+- Keep considering best code.
+- Keep function small.

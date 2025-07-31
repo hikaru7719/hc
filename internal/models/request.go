@@ -11,7 +11,6 @@ type Folder struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
-
 type Request struct {
 	ID        int               `json:"id"`
 	Name      string            `json:"name"`
@@ -23,7 +22,6 @@ type Request struct {
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
 }
-
 type Response struct {
 	StatusCode int               `json:"status_code"`
 	Headers    map[string]string `json:"headers"`
