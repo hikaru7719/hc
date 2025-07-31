@@ -6,6 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 HC (HTTP Client) is a GUI-based HTTP client built with Go backend and Next.js frontend. It runs as a local server (`hc serve`) providing a browser-based interface for making HTTP requests. The frontend is embedded in the Go binary for single-file distribution.
 
+## Technology Stack
+
+### Backend
+- Go 1.24+ - Core backend language
+- Cobra - CLI framework for command handling
+- Chi - HTTP router for REST API
+- SQLite - Embedded database for persistence
+- go:embed - Static file embedding for single binary distribution
+
+### Frontend
+- Next.js 15 - React framework with App Router
+- React 19 - UI library
+- TypeScript - Type-safe JavaScript
+- Tailwind CSS - Utility-first CSS framework
+- Biome - Fast formatter and linter
+- Lucide React - Icon library
+
+### Development Tools
+- Make - Build automation
+- Air - Hot reload for Go development
+- npm/pnpm - Node.js package management
+
 ## Common Commands
 
 ```bash
@@ -58,13 +80,89 @@ make build-all
 - `GET/PUT/DELETE /api/folders/:id` - Manage specific folder
 
 ### Database Schema
-- **folders**: Hierarchical folder structure (id, name, parent_id)
-- **requests**: HTTP requests (id, name, folder_id, method, url, headers, body)
+```sql
+-- Folders table for organizing requests
+CREATE TABLE IF NOT EXISTS folders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    parent_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
+);
+
+-- Requests table for storing HTTP requests
+CREATE TABLE IF NOT EXISTS requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    folder_id INTEGER,
+    method TEXT NOT NULL,
+    url TEXT NOT NULL,
+    headers TEXT,  -- JSON string
+    body TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE SET NULL
+);
+```
 
 ### Key Implementation Details
 - Frontend files are embedded using `go:embed` in `embed.go`
 - SQLite database is initialized in user's home directory (`~/.hc/hc.db`)
 - Static file serving falls back to index.html for client-side routing
+
+## Directory Structure
+
+### Project Root
+```
+.
+├── cmd/                    # CLI command definitions
+├── frontend/              # Next.js frontend application
+├── internal/              # Go internal packages
+├── docs/                  # Documentation
+├── .claude/               # Claude AI configuration and commands
+├── main.go               # Application entry point
+├── embed.go              # Frontend static files embedding
+├── Makefile              # Build and development commands
+├── go.mod, go.sum        # Go dependencies
+└── README.md             # Project documentation
+```
+
+### Backend Structure (Go)
+```
+cmd/                      # CLI command definitions
+internal/
+├── logger/               # Logging utilities
+├── middleware/           # HTTP middleware
+├── models/              # Data models
+├── proxy/               # HTTP proxy functionality
+├── server/              # HTTP server and handlers
+└── storage/             # Database layer
+```
+
+### Frontend Structure (Next.js)
+```
+frontend/
+├── app/                  # Next.js App Router
+├── components/          # React components
+├── api/                 # API client logic
+├── hooks/               # Custom React hooks
+├── utils/               # Utility functions
+├── constants/           # Application constants
+├── types/               # TypeScript type definitions
+├── biome.json          # Biome formatter/linter config
+├── tailwind.config.ts  # Tailwind CSS configuration
+├── tsconfig.json       # TypeScript configuration
+└── package.json        # Node.js dependencies
+```
+
+### Build Artifacts (git-ignored)
+```
+build/                   # Go binary output
+frontend/out/           # Next.js static export
+frontend/.next/         # Next.js build cache
+node_modules/           # Node.js dependencies
+```
 
 ### Code Policy
 
