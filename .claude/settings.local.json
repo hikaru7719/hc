@@ -23,7 +23,9 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_click",
       "Bash(go build:*)",
-      "Bash(go fmt:*)"
+      "Bash(go fmt:*)",
+      "Bash(go vet:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   },
