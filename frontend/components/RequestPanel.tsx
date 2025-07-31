@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useRequestPanelReducer } from "@/hooks/useRequestPanelReducer";
 import HeadersEditor from "@/components/HeadersEditor";
+import { COPY_FEEDBACK_DURATION, HTTP_METHOD_LIST } from "@/constants/http";
+import { useRequestPanelReducer } from "@/hooks/useRequestPanelReducer";
 import type { Request } from "@/types";
 import { generateCurlCommand } from "@/utils/curlGenerator";
-import { HTTP_METHOD_LIST, COPY_FEEDBACK_DURATION } from "@/constants/http";
 
 interface RequestPanelProps {
   request: Request | null;

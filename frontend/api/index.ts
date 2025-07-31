@@ -1,6 +1,6 @@
-export { requestsApi } from "./requests";
-export { proxyApi } from "./proxy";
 export { API_ENDPOINTS } from "./constants";
+export { proxyApi } from "./proxy";
+export { requestsApi } from "./requests";
 
 // SWR fetcher function
 export const fetcher = async (url: string) => {

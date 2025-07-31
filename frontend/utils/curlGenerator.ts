@@ -1,5 +1,5 @@
-import type { Request } from "@/types";
 import { HTTP_METHODS, METHODS_WITH_BODY } from "@/constants/http";
+import type { Request } from "@/types";
 
 export function generateCurlCommand(request: Request): string {
   const parts: string[] = ["curl"];

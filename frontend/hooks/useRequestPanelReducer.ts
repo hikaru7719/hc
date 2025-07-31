@@ -1,6 +1,6 @@
 import { useReducer } from "react";
-import type { Request } from "@/types";
 import { DEFAULT_METHOD, DEFAULT_REQUEST_NAME } from "@/constants/http";
+import type { Request } from "@/types";
 
 interface RequestPanelState {
   name: string;

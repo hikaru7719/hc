@@ -1,9 +1,9 @@
 import useSWR, { mutate } from "swr";
+import { API_ENDPOINTS, fetcher, proxyApi, requestsApi } from "@/api";
 import RequestPanel from "@/components/RequestPanel";
 import ResponsePanel from "@/components/ResponsePanel";
 import Sidebar from "@/components/Sidebar";
 import { useAppReducer } from "@/hooks/useAppReducer";
-import { fetcher, requestsApi, proxyApi, API_ENDPOINTS } from "@/api";
 import type { Request } from "@/types";
 
 export default function HomePage() {

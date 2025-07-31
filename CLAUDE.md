@@ -26,7 +26,7 @@ go test ./...         # Go tests only
 go test ./internal/storage -v  # Run specific package tests
 
 # Code quality
-make lint             # Run linters (go vet, go fmt, golangci-lint if installed, npm lint)
+make lint             # Run linters (go vet, go fmt, npm lint)
 go fmt ./...          # Format Go code
 go vet ./...          # Check Go code
 go build -o hc main.go # Build go binary
